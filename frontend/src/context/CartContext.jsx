@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -12,19 +13,27 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const { user } = useAuth();
+
+  // Get user-specific cart key
+  const getCartKey = () => user ? `cart_${user.id}` : 'cart_guest';
 
   useEffect(() => {
-    // Load cart from localStorage
-    const savedCart = localStorage.getItem('cart');
+    // Load cart from localStorage based on user
+    const cartKey = getCartKey();
+    const savedCart = localStorage.getItem(cartKey);
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
+    } else {
+      setCartItems([]);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     // Save cart to localStorage whenever it changes
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    const cartKey = getCartKey();
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  }, [cartItems, user]);
 
   const addToCart = (product) => {
     setCartItems(prevItems => {

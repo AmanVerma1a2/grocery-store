@@ -34,7 +34,7 @@ const Login = () => {
     try {
       if (isLogin) {
         // Login logic
-        const result = login(formData.email, formData.password);
+        const result = await login(formData.email, formData.password);
         
         if (result.success) {
           navigate(from, { replace: true });
@@ -55,7 +55,7 @@ const Login = () => {
           return;
         }
 
-        const result = signup({
+        const result = await signup({
           name: formData.name,
           email: formData.email,
           password: formData.password
@@ -190,31 +190,7 @@ const Login = () => {
             >
               {isLoading ? (isLogin ? 'Signing in...' : 'Creating account...') : (isLogin ? 'Sign in' : 'Create account')}
             </button>
-
-            {isLogin && (
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData({
-                    ...formData,
-                    email: 'john@example.com',
-                    password: 'password123'
-                  });
-                }}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                🚀 Quick Demo Login (john@example.com)
-              </button>
-            )}
           </div>
-
-          {isLogin && (
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Demo credentials: john@example.com / password123
-              </p>
-            </div>
-          )}
         </form>
       </div>
     </div>

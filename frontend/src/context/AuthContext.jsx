@@ -1,4 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_URL = 'http://localhost:5000/api/auth';
 
 const AuthContext = createContext();
 
@@ -15,55 +19,73 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
+    // Check if user is logged in from localStorage and validate with backend
+    const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    
+    if (token && savedUser) {
+      // Set axios default header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = (email, password) => {
-    // Simple mock authentication
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-      const { password: _, ...userWithoutPassword } = user;
-      setUser(userWithoutPassword);
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${API_URL}/login`, {
+        email,
+        password
+      });
+
+      const { token, user } = response.data;
+      
+      // Store token and user data
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Set axios default header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setUser(user);
+      toast.success(`Welcome back, ${user.name}!`);
       return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Login failed';
+      toast.error(message);
+      return { success: false, message };
     }
-    return { success: false, message: 'Invalid email or password' };
   };
 
-  const signup = (userData) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Check if user already exists
-    if (users.find(u => u.email === userData.email)) {
-      return { success: false, message: 'User already exists with this email' };
+  const signup = async (userData) => {
+    try {
+      const response = await axios.post(`${API_URL}/register`, userData);
+      
+      const { token, user } = response.data;
+      
+      // Store token and user data
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Set axios default header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setUser(user);
+      toast.success(`Welcome to Fresh Grocery Store, ${user.name}!`);
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      toast.error(message);
+      return { success: false, message };
     }
-
-    const newUser = {
-      id: Date.now(),
-      ...userData,
-      createdAt: new Date().toISOString()
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    const { password: _, ...userWithoutPassword } = newUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
-    
-    return { success: true };
   };
 
   const logout = () => {
+    toast.success('Logged out successfully!');
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
   };
 
   const value = {

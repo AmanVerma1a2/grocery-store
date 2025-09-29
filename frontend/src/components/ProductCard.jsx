@@ -1,15 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e) => {
     e.preventDefault(); // Prevent navigation when clicking add to cart
     e.stopPropagation();
+    
+    if (!user) {
+      toast.error('Please sign in or register to add items to cart');
+      navigate('/login', { state: { from: { pathname: window.location.pathname } } });
+      return;
+    }
+    
     addToCart(product);
+    toast.success(`${product.name} added to cart!`);
   };
 
   const handleImageError = (e) => {

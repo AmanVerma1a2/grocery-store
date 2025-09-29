@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiMinus, FiPlus, FiShoppingCart, FiArrowLeft, FiStar } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 import { getAllProducts } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -34,23 +35,31 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error('Please sign in or register to add items to cart');
+      navigate('/login', { state: { from: { pathname: `/product/${id}` } } });
+      return;
+    }
+
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
     }
-    // Just add to cart without navigation
+    toast.success(`${quantity} ${product.name}(s) added to cart!`);
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      toast.error('Please sign in or register to buy products');
+      navigate('/login', { state: { from: { pathname: '/checkout' } } });
+      return;
+    }
+
     // Add to cart first
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
     }
-    // Redirect to checkout if user is logged in, otherwise to login
-    if (user) {
-      navigate('/checkout');
-    } else {
-      navigate('/login', { state: { from: { pathname: '/checkout' } } });
-    }
+    toast.success(`${quantity} ${product.name}(s) added to cart!`);
+    navigate('/checkout');
   };
 
   const increaseQuantity = () => {

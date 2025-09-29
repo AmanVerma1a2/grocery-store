@@ -58,18 +58,6 @@ npm run dev
 
 5. Open your browser and visit \`http://localhost:5173\`
 
-## 🔑 Demo Credentials
-
-For testing purposes, you can use these demo accounts:
-
-- **Email**: john@example.com
-- **Password**: password123
-
-OR
-
-- **Email**: jane@example.com  
-- **Password**: password123
-
 ## 🏗️ Built With
 
 - **React.js** - Frontend framework
