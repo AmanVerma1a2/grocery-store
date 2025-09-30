@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiMinus, FiPlus, FiShoppingCart, FiArrowLeft, FiStar } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import { getAllProducts } from '../data/products';
+import { productsAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -14,14 +14,46 @@ const ProductDetail = () => {
   
   const [quantity, setQuantity] = useState(1);
   
-  const product = getAllProducts().find(p => p.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!product) {
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await productsAPI.getById(id);
+        setProduct(response.data.data);
+      } catch (err) {
+        setError('Failed to load product');
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Product Not Found</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              {error || 'Product Not Found'}
+            </h1>
             <button
               onClick={() => navigate('/')}
               className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"

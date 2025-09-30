@@ -122,3 +122,12 @@ This project is licensed under the MIT License.
 - Unsplash for product images
 - Tailwind CSS for the design system
 - React community for excellent documentation
+
+
+
+
+
+
+
+
+node seed.js for seeding new product just put code lines in seed.js and this command node seed.js 

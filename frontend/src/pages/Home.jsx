@@ -46,7 +46,7 @@ const Home = () => {
               </div>
               
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-6 pt-8 border-t border-green-500">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-8 border-t border-green-500">
                 <div className="text-center">
                   <div className="text-2xl font-bold">500+</div>
                   <div className="text-green-200 text-sm">Products</div>

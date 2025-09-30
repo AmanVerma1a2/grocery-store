@@ -37,7 +37,9 @@ router.post('/', auth, async (req, res) => {
     console.error('Create order error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error creating order'
+      message: 'Server error creating order',
+      error: error.message,
+      details: error
     });
   }
 });

@@ -44,30 +44,30 @@ const OrderSuccess = () => {
             <div className="bg-gray-50 rounded-lg p-6 mb-8">
               <h2 className="text-xl font-semibold mb-4">Order Details</h2>
               <div className="text-left space-y-2">
-                <p><strong>Order ID:</strong> #{order.id}</p>
-                <p><strong>Total Amount:</strong> ₹{order.total}</p>
-                <p><strong>Payment Method:</strong> {order.paymentMethod.toUpperCase()}</p>
-                <p><strong>Order Date:</strong> {new Date(order.date).toLocaleDateString()}</p>
+                <p><strong>Order ID:</strong> #{order._id || order.id}</p>
+                <p><strong>Total Amount:</strong> ₹{order.totalAmount || order.total}</p>
+                <p><strong>Payment Method:</strong> {(order.paymentMethod || 'N/A').toUpperCase()}</p>
+                <p><strong>Order Date:</strong> {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6 mb-8">
               <h3 className="text-lg font-semibold mb-4">Items Ordered</h3>
               <div className="space-y-3">
-                {order.items.map(item => (
-                  <div key={item.id} className="flex justify-between items-center">
+                {(order.items || []).map((item, index) => (
+                  <div key={item._id || item.id || index} className="flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.product?.image || item.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop'}
+                        alt={item.product?.name || item.name || 'Product'}
                         className="w-12 h-12 object-cover rounded"
                       />
                       <div className="text-left">
-                        <p className="font-medium">{item.name}</p>
+                        <p className="font-medium">{item.product?.name || item.name || 'Product'}</p>
                         <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="font-semibold">₹{item.price * item.quantity}</p>
+                    <p className="font-semibold">₹{(item.price || item.product?.price || 0) * item.quantity}</p>
                   </div>
                 ))}
               </div>
@@ -76,9 +76,9 @@ const OrderSuccess = () => {
             <div className="bg-gray-50 rounded-lg p-6 mb-8">
               <h3 className="text-lg font-semibold mb-4">Delivery Address</h3>
               <div className="text-left">
-                <p>{order.address.address}</p>
-                <p>{order.address.city}, {order.address.pincode}</p>
-                <p>Phone: {order.address.phone}</p>
+                <p>{order.deliveryAddress?.address || 'Address not available'}</p>
+                <p>{order.deliveryAddress?.city || ''}{order.deliveryAddress?.pincode ? `, ${order.deliveryAddress.pincode}` : ''}</p>
+                <p>Phone: {order.deliveryAddress?.phone || 'Not provided'}</p>
               </div>
             </div>
 

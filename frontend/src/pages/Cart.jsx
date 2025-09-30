@@ -60,8 +60,10 @@ const Cart = () => {
               </div>
 
               <div className="space-y-4">
-                {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                {cartItems.map(item => {
+                  const itemId = item._id || item.id;
+                  return (
+                  <div key={itemId} className="flex items-center space-x-4 p-4 border rounded-lg">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -76,7 +78,7 @@ const Cart = () => {
 
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(itemId, item.quantity - 1)}
                         className="p-1 hover:bg-gray-100 rounded"
                       >
                         <FiMinus size={16} />
@@ -85,7 +87,7 @@ const Cart = () => {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(itemId, item.quantity + 1)}
                         className="p-1 hover:bg-gray-100 rounded"
                       >
                         <FiPlus size={16} />
@@ -97,14 +99,15 @@ const Cart = () => {
                         ₹{item.price * item.quantity}
                       </p>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(itemId)}
                         className="text-red-600 hover:text-red-800 mt-1"
                       >
                         <FiTrash2 size={16} />
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="border-t mt-6 pt-6">

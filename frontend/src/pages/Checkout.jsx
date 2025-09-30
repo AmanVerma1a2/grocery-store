@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { ordersAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -9,8 +11,11 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const [orderForm, setOrderForm] = useState({
-    address: '',
+    fullName: user?.name || '',
+    addressLine1: '',
+    addressLine2: '',
     city: '',
+    state: '',
     pincode: '',
     phone: ''
   });
@@ -30,28 +35,64 @@ const Checkout = () => {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulate payment processing
-    setTimeout(() => {
-      // Save order to localStorage (in a real app, this would be sent to a server)
-      const order = {
-        id: Date.now(),
-        items: cartItems,
-        total: getCartTotal(),
-        address: orderForm,
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('Please login to place an order');
+        navigate('/login');
+        return;
+      }
+
+      // Prepare order data for backend
+      const orderData = {
+        items: cartItems.map(item => ({
+          product: item._id || item.id, // Use MongoDB _id if available, fallback to id
+          quantity: item.quantity,
+          price: item.price
+        })),
+        deliveryAddress: {
+          address: orderForm.addressLine1 + (orderForm.addressLine2 ? ', ' + orderForm.addressLine2 : ''),
+          city: orderForm.city,
+          pincode: orderForm.pincode,
+          phone: orderForm.phone
+        },
         paymentMethod,
-        user: user,
-        date: new Date().toISOString(),
-        status: 'confirmed'
+        totalAmount: getCartTotal()
       };
 
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      orders.push(order);
-      localStorage.setItem('orders', JSON.stringify(orders));
+      // Create order via API
+      const response = await ordersAPI.create(orderData);
 
-      clearCart();
+      if (response.data.success) {
+        const order = response.data.data;
+        
+        // Clear cart after successful order
+        clearCart();
+        
+        // Show success message
+        toast.success('Order placed successfully!');
+        
+        // Navigate to success page
+        navigate('/order-success', { 
+          state: { 
+            order: {
+              ...order,
+              id: order._id
+            }
+          } 
+        });
+      } else {
+        throw new Error(response.data.message || 'Failed to place order');
+      }
+
+    } catch (error) {
+      console.error('Order creation error:', error);
+      console.error('Error details:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Failed to place order. Please try again.');
+    } finally {
       setIsProcessing(false);
-      navigate('/order-success', { state: { order } });
-    }, 3000);
+    }
   };
 
   if (!user) {
@@ -106,19 +147,46 @@ const Checkout = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Address
+                      Full Name
                     </label>
-                    <textarea
-                      name="address"
-                      value={orderForm.address}
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={orderForm.fullName}
                       onChange={handleOrderFormChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      rows="3"
-                      placeholder="Enter your full address"
+                      placeholder="Enter your full name"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Address Line 1
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine1"
+                      value={orderForm.addressLine1}
+                      onChange={handleOrderFormChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="House no, Street name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Address Line 2 (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine2"
+                      value={orderForm.addressLine2}
+                      onChange={handleOrderFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="Apartment, Area, Landmark"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         City
@@ -135,6 +203,22 @@ const Checkout = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={orderForm.state}
+                        onChange={handleOrderFormChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="State"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Pincode
                       </label>
                       <input
@@ -147,20 +231,20 @@ const Checkout = () => {
                         placeholder="Pincode"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={orderForm.phone}
-                      onChange={handleOrderFormChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Phone number"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={orderForm.phone}
+                        onChange={handleOrderFormChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Phone number"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

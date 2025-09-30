@@ -141,6 +141,13 @@ const products = [
     description: "Pure coconut oil - 500ml",
     category: "dailyNeeds"
   },
+   {
+    name: "Green Chillies",
+    price: 2323,
+    image: "https://images.unsplash.com/photo-1583278364772-6f9c31cb4089?w=400&h=300&fit=crop",
+    description: "Fresh green chillies - 100g",
+    category: "vegetables"
+  },
   {
     name: "Marie Biscuits",
     price: 35,

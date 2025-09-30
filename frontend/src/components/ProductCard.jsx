@@ -30,7 +30,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Link
-      to={`/product/${product.id}`}
+      to={`/product/${product._id || product.id}`}
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow block"
     >
       <div className="relative">

@@ -15,15 +15,16 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import ProductDetail from './pages/ProductDetail';
+import Orders from './pages/Orders';
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <Router>
-          <div className="App">
+          <div className="App min-h-screen flex flex-col">
             <Header />
-            <main>
+            <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
               </Routes>
             </main>
