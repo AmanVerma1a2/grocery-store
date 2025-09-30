@@ -1,6 +1,7 @@
 # 🛒 Fresh Grocery Store
 
 A modern, responsive grocery delivery application built with React.js, Vite, and Tailwind CSS.
+<img width="1345" height="601" alt="Capture1" src="https://github.com/user-attachments/assets/0459187e-3f8d-455d-a107-7ef63bc36a07" />
 
 ## ✨ Features
 
@@ -10,7 +11,6 @@ A modern, responsive grocery delivery application built with React.js, Vite, and
 - **💳 Payment Gateway**: UPI and Cash on Delivery options
 - **📱 Responsive Design**: Works on all devices
 - **🚚 Order Management**: Complete checkout flow with order confirmation
-
 ## 🛍️ Product Categories
 
 ### Vegetables
@@ -26,6 +26,10 @@ A modern, responsive grocery delivery application built with React.js, Vite, and
 - Dal (Toor, Moong)
 - Fresh Milk
 - Cooking Oil (Sunflower, Coconut)
+<img width="1358" height="703" alt="Capture2" src="https://github.com/user-attachments/assets/e7bcc181-2ab9-4f7e-a35c-76ad98ac7995" />
+<img width="1354" height="600" alt="Capture3" src="https://github.com/user-attachments/assets/3d98d440-479f-48a0-97a1-8c9394f0dae6" />
+
+<img width="955" height="519" alt="apture" src="https://github.com/user-attachments/assets/3b39560a-ef87-40d8-9414-ea3a9d745f45" />
 
 ## 🚀 Getting Started
 
@@ -113,9 +117,6 @@ npm run dev
 4. Push to the branch (\`git push origin feature/AmazingFeature\`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
